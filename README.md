@@ -197,3 +197,161 @@ In this fixed version, the `cache.clear()` method is called after the data proce
 <hr>
 
 
+# [Null Pointer Errors](#null-pointer-errors)
+
+Null pointer errors occur when an operation is performed on an object that is `null`, leading to a `NullPointerException` (NPE) at runtime. In Java, these errors can result in unexpected crashes and difficult-to-debug issues. Identifying and handling null references correctly is crucial to writing robust code.
+
+## [NULL_POINTER](#null_pointer)
+
+
+A `NULL_POINTER` error occurs when a method or field is accessed on an object that is `null`. This can result in a `NullPointerException`
+
+### Problem Example:
+
+```java
+public class NullPointerExample {
+    public void printLength(String str) {
+        System.out.println("String length: " + str.length()); // This will throw a NullPointerException if str is null
+    }
+
+    public static void main(String[] args) {
+        NullPointerExample example = new NullPointerExample();
+        example.printLength(null); // Passing null will cause an NPE
+    }
+}
+```
+
+In this example, calling `str.length()` on a `null` object will throw a `NullPointerException`, leading to a crash.
+
+### Solution:
+
+Always check for `null` before dereferencing an object or use `Optional` to handle potentially null values in a safe way.
+
+```java
+public class NullPointerFixed {
+    public void printLength(String str) {
+        if (str != null) {
+            System.out.println("String length: " + str.length());
+        } else {
+            System.out.println("String is null.");
+        }
+    }
+
+    public static void main(String[] args) {
+        NullPointerFixed example = new NullPointerFixed();
+        example.printLength(null); // Safe, outputs "String is null."
+    }
+}
+```
+
+In this fixed version, the `null` check prevents the `NullPointerException`.
+
+
+
+## [NULL_RETURNS](#null_returns)
+
+A `NULL_RETURNS` error occurs when a method returns `null` where an object is expected, potentially leading to a `NullPointerException` when the result is used without proper null checking.
+
+### Problem Example:
+
+```java
+public class NullReturnsExample {
+    public String getMessage(boolean returnNull) {
+        if (returnNull) {
+            return null; // Method may return null
+        }
+        return "Hello, World!";
+    }
+
+    public void printMessage() {
+        String message = getMessage(true); // Returns null
+        System.out.println(message.length()); // NullPointerException if message is null
+    }
+
+    public static void main(String[] args) {
+        NullReturnsExample example = new NullReturnsExample();
+        example.printMessage();
+    }
+}
+```
+
+In this example, the method `getMessage` may return `null`, which is then dereferenced without a null check, leading to a `NullPointerException`.
+
+### Solution:
+
+You can either avoid returning `null` by returning a default value or use proper null checks when consuming the returned value.
+
+```java
+public class NullReturnsFixed {
+    public String getMessage(boolean returnNull) {
+        if (returnNull) {
+            return "Default message"; // Return a default value instead of null
+        }
+        return "Hello, World!";
+    }
+
+    public void printMessage() {
+        String message = getMessage(true);
+        System.out.println(message.length()); // Safe, no null values returned
+    }
+
+    public static void main(String[] args) {
+        NullReturnsFixed example = new NullReturnsFixed();
+        example.printMessage();
+    }
+}
+```
+
+In this fixed version, the method returns a default value instead of `null`, preventing any `NullPointerException`.
+
+
+## [FORWARD_NULL](#forward_null)
+
+A `FORWARD_NULL` error occurs when a variable that has been checked for `null` is later used as if it’s non-null, despite potentially being `null` at that point. This often happens when code paths overlook earlier `null` checks.
+
+### Problem Example:
+
+```java
+public class ForwardNullExample {
+    public void process(String str) {
+        if (str == null) {
+            System.out.println("Input is null.");
+        }
+        // The null check should prevent further processing, but the code continues with a risky dereference
+        System.out.println("String length: " + str.length()); // NullPointerException possible
+    }
+
+    public static void main(String[] args) {
+        ForwardNullExample example = new ForwardNullExample();
+        example.process(null); // Will lead to a NullPointerException
+    }
+}
+```
+
+In this example, even though there is a `null` check, the code proceeds to use `str` without confirming its state after the check, leading to a `NullPointerException`.
+
+### Solution:
+
+Ensure the flow of control prevents the use of a variable after it is found to be `null`.
+```java
+public class ForwardNullFixed {
+    public void process(String str) {
+        if (str == null) {
+            System.out.println("Input is null.");
+            return; // Exit early if null to prevent further use
+        }
+        System.out.println("String length: " + str.length()); // Safe to use str here
+    }
+
+    public static void main(String[] args) {
+        ForwardNullFixed example = new ForwardNullFixed();
+        example.process(null); // No NullPointerException
+    }
+}
+```
+
+In this fixed version, the `null` check ensures the method exits early if `str` is `null`, preventing the problematic dereference.
+
+<br>
+<hr>
+

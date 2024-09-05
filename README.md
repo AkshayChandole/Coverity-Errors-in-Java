@@ -69,15 +69,14 @@ This repository contains examples and explanations of various types of errors de
 
 <hr>
 
-# Introduction
-
+# [Introduction](#introduction)
 Coverity is a powerful static analysis tool used to identify and resolve defects in code. It helps improve code quality by detecting bugs, vulnerabilities, and potential performance issues across multiple programming languages, including Java.
 
-## About Coverity
+## [About Coverity](#about-coverity)
 
 Coverity works by analyzing the source code of a program without executing it, identifying defects that can lead to crashes, performance degradation, or security vulnerabilities. For Java developers, it provides a deep analysis of common issues like null pointer dereferences, resource leaks, concurrency errors, and security vulnerabilities.
 
-## Purpose of This Repository
+## [Purpose of This Repository](#purpose-of-this-repository)
 
 The **Coverity-Errors-in-Java** repository aims to provide a comprehensive resource for Java developers to better understand the types of issues detected by Coverity. It offers examples of real-world defects, detailed explanations of each error type, and best practices for resolving these issues.
 

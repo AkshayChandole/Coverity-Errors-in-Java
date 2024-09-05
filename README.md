@@ -90,3 +90,110 @@ By exploring this repository, developers will gain insights into common pitfalls
 <hr>
 
 
+# [Memory Management Errors](#memory-management-errors)
+
+Memory management is critical in Java, even with garbage collection, as poorly managed resources or incorrect code practices can still lead to issues like resource leaks and memory leaks. These errors can impact the performance and stability of Java applications.
+
+## [RESOURCE_LEAK](#resource_leak)
+
+A `RESOURCE_LEAK` occurs when an external resource (like files, network sockets, or database connections) is not properly closed after use. In Java, even though memory is managed by the garbage collector, resources must be explicitly released.
+
+### Problem Example:
+```java
+import java.io.*;
+
+public class ResourceLeakExample {
+    public void readFile(String filePath) throws IOException {
+        FileInputStream fis = new FileInputStream(filePath);
+        BufferedReader reader = new BufferedReader(new InputStreamReader(fis));
+        String line;
+        while ((line = reader.readLine()) != null) {
+            System.out.println(line);
+        }
+        // fis and reader are not closed - this leads to a resource leak!
+    }
+}
+```
+
+In this example, the `FileInputStream` and `BufferedReader` are opened but never closed, causing a resource leak. If this code runs in a large loop or for a long time, it may exhaust the available file handles, causing the program to crash.
+
+### Solution:
+
+Using Java's `try-with-resources` ensures that resources are automatically closed when the block is exited, even if an exception occurs.
+
+```java
+import java.io.*;
+
+public class ResourceLeakFixed {
+    public void readFile(String filePath) {
+        try (FileInputStream fis = new FileInputStream(filePath);
+             BufferedReader reader = new BufferedReader(new InputStreamReader(fis))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                System.out.println(line);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
+```
+
+Here, both `FileInputStream` and `BufferedReader` are automatically closed at the end of the `try` block, preventing any resource leak.
+
+
+## [MEMORY_LEAK](#memory_leak)
+
+A `MEMORY_LEAK` in Java refers to a situation where objects are no longer needed but are still referenced, preventing the garbage collector from reclaiming the memory. This can lead to excessive memory usage, performance degradation, and even `OutOfMemoryError`.
+
+### Problem Example:
+
+```java
+import java.util.ArrayList;
+import java.util.List;
+
+public class MemoryLeakExample {
+    private List<String> cache = new ArrayList<>();
+    
+    public void addToCache(String data) {
+        cache.add(data); // Cache grows without limits, causing a memory leak
+    }
+    
+    public void processData() {
+        // Processing logic that never clears the cache
+    }
+}
+```
+
+In this example, the `cache` list keeps growing as more data is added, but it's never cleared. Over time, this can lead to a memory leak if the application keeps adding data without removing it.
+
+### Solution:
+
+To resolve the memory leak, ensure that unused objects are dereferenced, or use data structures that manage memory more effectively (e.g., `WeakHashMap`, or explicitly clearing the cache).
+
+```java
+import java.util.ArrayList;
+import java.util.List;
+
+public class MemoryLeakFixed {
+    private List<String> cache = new ArrayList<>();
+    
+    public void addToCache(String data) {
+        cache.add(data);
+    }
+    
+    public void processData() {
+        // Processing logic...
+        
+        // Clear the cache after use to prevent memory leaks
+        cache.clear();
+    }
+}
+```
+
+In this fixed version, the `cache.clear()` method is called after the data processing, ensuring that the list doesn't grow indefinitely and the memory used by the cache is freed.
+
+<br>
+<hr>
+
+

@@ -355,3 +355,243 @@ In this fixed version, the `null` check ensures the method exits early if `str` 
 <br>
 <hr>
 
+
+#  [Concurrency Errors](#concurrency-errors)
+
+Concurrency errors in Java occur when multiple threads interact improperly, leading to inconsistent data, deadlocks, or thread exhaustion. These issues can cause unexpected behavior and crashes in multi-threaded applications. Identifying and resolving these errors is crucial for reliable and efficient concurrency.
+
+## [DATA_RACE](#data_race)
+
+A **Data Race** occurs when two or more threads access the same variable concurrently, and at least one of them writes to the variable, without proper synchronization. This can lead to inconsistent or incorrect results, as the threads can overwrite each other’s changes.
+
+#### Problem Example:
+
+```java
+public class DataRaceExample {
+    private int counter = 0;
+
+    public void increment() {
+        for (int i = 0; i < 10000; i++) {
+            counter++;  // This is not synchronized, causing a data race
+        }
+    }
+
+    public static void main(String[] args) throws InterruptedException {
+        DataRaceExample example = new DataRaceExample();
+
+        Thread thread1 = new Thread(example::increment);
+        Thread thread2 = new Thread(example::increment);
+
+        thread1.start();
+        thread2.start();
+
+        thread1.join();
+        thread2.join();
+
+        System.out.println("Final Counter Value: " + example.counter);  // Result is unpredictable due to data race
+    }
+}
+```
+
+In this example, multiple threads increment the `counter` variable without synchronization, leading to a race condition where the final result is unpredictable.
+
+### Solution:
+
+Use synchronization mechanisms such as `synchronized` blocks or `ReentrantLock` to ensure that only one thread can modify shared data at a time.
+
+```java
+public class DataRaceFixed {
+    private int counter = 0;
+
+    public synchronized void increment() {  // Synchronized method to prevent data race
+        for (int i = 0; i < 10000; i++) {
+            counter++;
+        }
+    }
+
+    public static void main(String[] args) throws InterruptedException {
+        DataRaceFixed example = new DataRaceFixed();
+
+        Thread thread1 = new Thread(example::increment);
+        Thread thread2 = new Thread(example::increment);
+
+        thread1.start();
+        thread2.start();
+
+        thread1.join();
+        thread2.join();
+
+        System.out.println("Final Counter Value: " + example.counter);  // Correct, consistent result
+    }
+}
+```
+
+In this fixed version, the `increment` method is synchronized, ensuring that only one thread can increment the counter at a time, preventing a data race.
+
+
+## [DEADLOCK](#deadlock)
+
+A **Deadlock** occurs when two or more threads are blocked forever, each waiting for the other to release a resource. This usually happens when threads acquire locks in an inconsistent order, leading to a circular dependency.
+
+### Problem Example:
+
+```java
+public class DeadlockExample {
+    private final Object lock1 = new Object();
+    private final Object lock2 = new Object();
+
+    public void method1() {
+        synchronized (lock1) {
+            System.out.println("Thread 1: Holding lock 1...");
+            try { Thread.sleep(100); } catch (InterruptedException e) {}
+
+            synchronized (lock2) {
+                System.out.println("Thread 1: Holding lock 2...");
+            }
+        }
+    }
+
+    public void method2() {
+        synchronized (lock2) {
+            System.out.println("Thread 2: Holding lock 2...");
+            try { Thread.sleep(100); } catch (InterruptedException e) {}
+
+            synchronized (lock1) {
+                System.out.println("Thread 2: Holding lock 1...");
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        DeadlockExample example = new DeadlockExample();
+
+        Thread thread1 = new Thread(example::method1);
+        Thread thread2 = new Thread(example::method2);
+
+        thread1.start();
+        thread2.start();
+    }
+}
+```
+
+In this example, `method1` and `method2` acquire `lock1` and `lock2` in different orders, leading to a deadlock where each thread is waiting for the other to release a lock.
+
+### Solution:
+
+To prevent deadlock, ensure that locks are always acquired in the same order across all threads.
+
+```java
+public class DeadlockFixed {
+    private final Object lock1 = new Object();
+    private final Object lock2 = new Object();
+
+    public void method1() {
+        synchronized (lock1) {
+            System.out.println("Thread 1: Holding lock 1...");
+            try { Thread.sleep(100); } catch (InterruptedException e) {}
+
+            synchronized (lock2) {
+                System.out.println("Thread 1: Holding lock 2...");
+            }
+        }
+    }
+
+    public void method2() {
+        synchronized (lock1) {  // Locks acquired in the same order as method1
+            System.out.println("Thread 2: Holding lock 1...");
+            try { Thread.sleep(100); } catch (InterruptedException e) {}
+
+            synchronized (lock2) {
+                System.out.println("Thread 2: Holding lock 2...");
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        DeadlockFixed example = new DeadlockFixed();
+
+        Thread thread1 = new Thread(example::method1);
+        Thread thread2 = new Thread(example::method2);
+
+        thread1.start();
+        thread2.start();
+    }
+}
+```
+
+In this fixed version, both methods acquire locks in the same order (`lock1` first, then `lock2`), preventing deadlock.
+
+## [THREAD_LEAK](#thread_leak)
+
+A **Thread Leak** occurs when threads are created but never properly terminated, leading to resource exhaustion and potentially crashing the application.
+
+### Problem Example:
+
+```java
+public class ThreadLeakExample {
+    public void startThread() {
+        new Thread(() -> {
+            while (true) {  // Infinite loop, never terminates
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+            }
+        }).start();
+    }
+
+    public static void main(String[] args) {
+        ThreadLeakExample example = new ThreadLeakExample();
+
+        for (int i = 0; i < 1000; i++) {
+            example.startThread();  // Continuously starts new threads, leading to a leak
+        }
+    }
+}
+```
+
+In this example, a new thread is created with an infinite loop, leading to a resource leak as the application keeps spawning threads without terminating them.
+
+### Solution:
+
+Use a thread pool, such as `ExecutorService`, to manage threads and ensure proper termination.
+
+```java
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+public class ThreadLeakFixed {
+    private final ExecutorService executorService = Executors.newFixedThreadPool(10);
+
+    public void startTask() {
+        executorService.submit(() -> {
+            try {
+                Thread.sleep(1000);  // Simulate a task
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        });
+    }
+
+    public void shutdown() {
+        executorService.shutdown();
+    }
+
+    public static void main(String[] args) {
+        ThreadLeakFixed example = new ThreadLeakFixed();
+
+        for (int i = 0; i < 1000; i++) {
+            example.startTask();  // Uses a thread pool to manage threads efficiently
+        }
+
+        example.shutdown();  // Properly terminates threads when done
+    }
+}
+```
+
+In this fixed version, an `ExecutorService` manages a fixed number of threads, preventing thread leaks by reusing threads and ensuring they are terminated correctly.
+
+<br>
+<hr>
+

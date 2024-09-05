@@ -595,3 +595,121 @@ In this fixed version, an `ExecutorService` manages a fixed number of threads, p
 <br>
 <hr>
 
+# [Resource Management Errors](#resource-management-errors)
+
+Resource management errors occur when resources such as memory, file handles, or database connections are not properly managed, leading to resource leaks or inefficiencies. Properly handling resources ensures that they are acquired and released correctly to avoid performance issues and resource exhaustion.
+
+## [RESOURCE_LEAK](#resource_leak)
+
+A **Resource Leak** happens when resources like file handles, database connections, or network sockets are not properly released after they are no longer needed. This can lead to resource exhaustion, application crashes, and degraded performance.
+
+### Problem Example:
+
+```java
+import java.io.FileReader;
+import java.io.IOException;
+
+public class ResourceLeakExample {
+    public void readFile(String filePath) {
+        FileReader reader = null;
+        try {
+            reader = new FileReader(filePath);
+            // Perform file reading operations
+        } catch (IOException e) {
+            e.printStackTrace();
+        } // FileReader is not closed here, causing a resource leak
+    }
+
+    public static void main(String[] args) {
+        ResourceLeakExample example = new ResourceLeakExample();
+        example.readFile("example.txt");
+    }
+}
+```
+
+In this example, the `FileReader` resource is not closed explicitly, leading to a potential resource leak if the file is not properly closed.
+
+### Solution:
+
+Use the `try-with-resources` statement, which ensures that resources are automatically closed after their use.
+
+```java
+import java.io.FileReader;
+import java.io.IOException;
+
+public class ResourceLeakFixed {
+    public void readFile(String filePath) {
+        try (FileReader reader = new FileReader(filePath)) {
+            // Perform file reading operations
+        } catch (IOException e) {
+            e.printStackTrace();
+        } // FileReader is automatically closed
+    }
+
+    public static void main(String[] args) {
+        ResourceLeakFixed example = new ResourceLeakFixed();
+        example.readFile("example.txt");
+    }
+}
+```
+
+In this fixed version, the `FileReader` is automatically closed at the end of the `try` block, preventing resource leaks.
+
+
+## [UNUSED_VALUE](#unused_value)
+
+An **Unused Value** error occurs when a value is computed or retrieved but never used in the program. This can indicate redundant operations or logic errors, and may also lead to inefficient code.
+
+#### Problem Example:
+```java
+public class UnusedValueExample {
+    public void calculate() {
+        int result = expensiveComputation(); // Result is not used
+        System.out.println("Computation done."); // No use of 'result'
+    }
+
+    private int expensiveComputation() {
+        // Simulate an expensive computation
+        return 42;
+    }
+
+    public static void main(String[] args) {
+        UnusedValueExample example = new UnusedValueExample();
+        example.calculate();
+    }
+}
+```
+
+In this example, the result of `expensiveComputation` is not used, which may indicate inefficient or incorrect code.
+
+### Solution:
+
+Use the computed value as intended or remove the computation if it is unnecessary.
+
+```java
+public class UnusedValueFixed {
+    public void calculate() {
+        int result = expensiveComputation();
+        System.out.println("Result of computation: " + result); // Use the result appropriately
+    }
+
+    private int expensiveComputation() {
+        // Simulate an expensive computation
+        return 42;
+    }
+
+    public static void main(String[] args) {
+        UnusedValueFixed example = new UnusedValueFixed();
+        example.calculate();
+    }
+}
+```
+
+In this fixed version, the computed `result` is used in the `System.out.println` statement, making the code more efficient and purposeful.
+
+<br>
+<hr>
+
+
+
+

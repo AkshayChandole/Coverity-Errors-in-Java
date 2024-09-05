@@ -710,6 +710,160 @@ In this fixed version, the computed `result` is used in the `System.out.println`
 <br>
 <hr>
 
+# [Control Flow Errors](#control-flow-errors)
+
+
+Control flow errors occur when the execution path of a program is not as expected, leading to redundant, infinite, or unreachable code. These errors can cause inefficiencies, unintended behavior, or crashes. Ensuring proper control flow helps in writing more reliable and maintainable code.
+
+## [DEADCODE](#deadcode)
+
+**Dead Code** refers to parts of the code that are never executed, often due to conditions that always evaluate to `false` or unreachable statements. Dead code can make the codebase harder to maintain and can potentially contain bugs.
+
+### Problem Example:
+
+```java
+public class DeadCodeExample {
+    public void exampleMethod(boolean flag) {
+        if (flag) {
+            System.out.println("Flag is true.");
+        } else {
+            return; // This return makes the following code unreachable
+            System.out.println("This line will never be executed.");
+        }
+    }
+
+    public static void main(String[] args) {
+        DeadCodeExample example = new DeadCodeExample();
+        example.exampleMethod(false);
+    }
+}
+```
+
+In this example, the `System.out.println` statement after the `return` statement will never be executed, making it dead code.
+
+### Solution:
+
+Remove the dead code to clean up the codebase and improve readability.
+```java
+public class DeadCodeFixed {
+    public void exampleMethod(boolean flag) {
+        if (flag) {
+            System.out.println("Flag is true.");
+        } else {
+            System.out.println("Flag is false.");
+        }
+    }
+
+    public static void main(String[] args) {
+        DeadCodeFixed example = new DeadCodeFixed();
+        example.exampleMethod(false);
+    }
+}
+```
+
+In this fixed version, both branches of the `if-else` statement have reachable code, making the code more clear and purposeful.
+
+
+## [INFINITE_LOOP](#infinite_loop)
+
+An **Infinite Loop** occurs when a loop never terminates, causing the application to hang or consume excessive resources. This typically happens due to incorrect loop conditions or logic.
+
+### Problem Example:
+
+```java
+public class InfiniteLoopExample {
+    public void runLoop() {
+        int counter = 0;
+        while (counter < 10) {
+            System.out.println("Counter: " + counter);
+            // Counter is never incremented, causing an infinite loop
+        }
+    }
+
+    public static void main(String[] args) {
+        InfiniteLoopExample example = new InfiniteLoopExample();
+        example.runLoop();
+    }
+}
+```
+
+In this example, the `counter` variable is not incremented within the `while` loop, leading to an infinite loop.
+
+### Solution:
+
+Ensure that the loop has a condition that will eventually be false, or break the loop under certain conditions.
+
+```java
+public class InfiniteLoopFixed {
+    public void runLoop() {
+        int counter = 0;
+        while (counter < 10) {
+            System.out.println("Counter: " + counter);
+            counter++;  // Increment counter to eventually exit the loop
+        }
+    }
+
+    public static void main(String[] args) {
+        InfiniteLoopFixed example = new InfiniteLoopFixed();
+        example.runLoop();
+    }
+}
+```
+
+In this fixed version, the `counter` is incremented within the loop, allowing the loop to eventually terminate.
+
+
+## [UNREACHABLE_CODE](#unreachable_code)
+
+**Unreachable Code** refers to code that can never be executed because it comes after a statement that always transfers control away from the code block, such as a `return`, `break`, or `throw` statement.
+
+### Problem Example:
+```java
+public class UnreachableCodeExample {
+    public void checkValue(int value) {
+        if (value > 10) {
+            System.out.println("Value is greater than 10.");
+            return;
+        }
+        System.out.println("This line will be executed if value <= 10.");
+        System.out.println("This line will never be executed if value > 10."); // Unreachable code
+    }
+
+    public static void main(String[] args) {
+        UnreachableCodeExample example = new UnreachableCodeExample();
+        example.checkValue(15);
+    }
+}
+```
+
+In this example, the `System.out.println` statement after the `return` will never be executed, making it unreachable code.
+
+### Solution:
+
+Remove or refactor the unreachable code to ensure that all code is necessary and reachable.
+
+```java
+public class UnreachableCodeFixed {
+    public void checkValue(int value) {
+        if (value > 10) {
+            System.out.println("Value is greater than 10.");
+            return;
+        }
+        System.out.println("This line will be executed if value <= 10.");
+    }
+
+    public static void main(String[] args) {
+        UnreachableCodeFixed example = new UnreachableCodeFixed();
+        example.checkValue(15);
+    }
+}
+```
+
+In this fixed version, the unreachable code has been removed, making the code cleaner and easier to maintain.
+
+<br>
+<hr>
+
 
 
 

@@ -69,7 +69,7 @@ This repository contains examples and explanations of various types of errors de
 
 <hr>
 
-# 1. Introduction
+## Introduction
 
 Coverity is a powerful static analysis tool used to identify and resolve defects in code. It helps improve code quality by detecting bugs, vulnerabilities, and potential performance issues across multiple programming languages, including Java.
 

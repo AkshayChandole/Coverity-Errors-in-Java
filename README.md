@@ -864,6 +864,133 @@ In this fixed version, the unreachable code has been removed, making the code cl
 <br>
 <hr>
 
+# [API Usage Errors](#api-usage-errors)
+
+API usage errors occur when an application incorrectly uses or interacts with external libraries or APIs. These errors can lead to incorrect behavior, security vulnerabilities, or performance issues. Properly understanding and adhering to API documentation and best practices is crucial for reliable and efficient code.
+
+## [MISUSE_OF_API](#misuse_of_api)
+
+**Misuse of API** refers to scenarios where an API is used in a manner that is contrary to its intended use, leading to incorrect results, performance issues, or potential errors.
+
+### Problem Example:
+
+```java
+import java.util.ArrayList;
+import java.util.List;
+
+public class MisuseOfAPIExample {
+    public void exampleMethod() {
+        List<String> list = new ArrayList<>();
+        list.add("Item1");
+        list.add("Item2");
+
+        // Incorrectly using the List API to sort (which is not a valid operation)
+        list.sort(null);  // List is not sorted; sort() expects a Comparator
+        System.out.println("List: " + list);
+    }
+
+    public static void main(String[] args) {
+        MisuseOfAPIExample example = new MisuseOfAPIExample();
+        example.exampleMethod();
+    }
+}
+```
+
+In this example, the `sort` method is used incorrectly because it expects a `Comparator` argument but is called with `null`, which does not sort the list.
+
+### Solution:
+
+Use the API as intended by providing the correct arguments or parameters.
+
+```java
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+public class MisuseOfAPIFixed {
+    public void exampleMethod() {
+        List<String> list = new ArrayList<>();
+        list.add("Item1");
+        list.add("Item2");
+
+        // Correctly using the List API to sort with a comparator
+        Collections.sort(list);
+        System.out.println("Sorted List: " + list);
+    }
+
+    public static void main(String[] args) {
+        MisuseOfAPIFixed example = new MisuseOfAPIFixed();
+        example.exampleMethod();
+    }
+}
+```
+
+In this fixed version, the `Collections.sort` method is used correctly to sort the list.
+
+## [BAD_API_USAGE](#bad_api_usage)
+
+**Bad API Usage** involves improper or inefficient use of an API, often leading to performance problems, resource leaks, or unexpected behavior. This typically happens when APIs are used in ways not recommended by their documentation.
+
+### Problem Example:
+
+```java
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+
+public class BadAPIUsageExample {
+    public void readFile(String filePath) throws IOException {
+        BufferedReader reader = new BufferedReader(new FileReader(filePath));
+        // Not closing the reader explicitly, leading to resource leak
+        String line;
+        while ((line = reader.readLine()) != null) {
+            System.out.println(line);
+        }
+        // reader.close(); // Not closing here is bad usage
+    }
+
+    public static void main(String[] args) throws IOException {
+        BadAPIUsageExample example = new BadAPIUsageExample();
+        example.readFile("example.txt");
+    }
+}
+```
+
+In this example, the `BufferedReader` is not closed, which can lead to resource leaks.
+
+### Solution:
+
+Use the API according to best practices, such as ensuring resources are properly closed.
+
+```java
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+
+public class BadAPIUsageFixed {
+    public void readFile(String filePath) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                System.out.println(line);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } // BufferedReader is automatically closed here
+    }
+
+    public static void main(String[] args) {
+        BadAPIUsageFixed example = new BadAPIUsageFixed();
+        example.readFile("example.txt");
+    }
+}
+```
+
+In this fixed version, the `BufferedReader` is properly closed using the `try-with-resources` statement, ensuring resources are managed efficiently.
+
+<br>
+<hr>
+
 
 
 

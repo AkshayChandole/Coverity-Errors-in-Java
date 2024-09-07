@@ -1319,4 +1319,107 @@ In this solution, a check is performed to ensure that the value fits within the 
 <br>
 <hr>
 
+# [Exception Handling Errors](#exception-handling-errors)
+
+Proper exception handling is crucial in ensuring that a program can respond to unexpected conditions and failures gracefully. Exception handling errors occur when exceptions are either not handled properly or not handled at all, leading to crashes or undefined behavior.
+
+## [MISMANAGED_EXCEPTIONS](#mismanaged_exceptions)
+
+**Mismanaged Exceptions** occur when an exception is caught, but either no meaningful action is taken, or the exception is swallowed without logging or rethrowing. This can lead to debugging challenges and obscure application errors.
+
+### Problem Example:
+
+```java
+public class MismanagedExceptionExample {
+    public static void main(String[] args) {
+        try {
+            int[] numbers = {1, 2, 3};
+            int result = numbers[5]; // This will throw ArrayIndexOutOfBoundsException
+        } catch (ArrayIndexOutOfBoundsException e) {
+            // Problem: Mismanaged exception, simply ignoring the exception
+        }
+        System.out.println("Program continues...");
+    }
+}
+```
+
+In this example, the exception is caught but not logged or handled, making it hard to debug and trace what went wrong. The program continues running as if nothing happened, but crucial information is lost.
+
+### Solution:
+
+Handle exceptions properly by logging, rethrowing, or taking corrective action.
+
+```java
+import java.util.logging.*;
+
+public class MismanagedExceptionFixed {
+    private static final Logger logger = Logger.getLogger(MismanagedExceptionFixed.class.getName());
+
+    public static void main(String[] args) {
+        try {
+            int[] numbers = {1, 2, 3};
+            int result = numbers[5]; // This will throw ArrayIndexOutOfBoundsException
+        } catch (ArrayIndexOutOfBoundsException e) {
+            // Solution: Log the exception and take necessary action
+            logger.log(Level.SEVERE, "Array index is out of bounds: " + e.getMessage(), e);
+        }
+        System.out.println("Program continues...");
+    }
+}
+```
+
+Here, the exception is caught and logged using a `Logger`. This helps identify and troubleshoot the issue without leaving it unresolved.
+
+
+## [UNHANDLED_EXCEPTIONS](#unhandled_exceptions)
+
+**Unhandled Exceptions** occur when a method that can throw an exception doesn't handle it, and it propagates up the call stack, potentially causing the program to crash. In critical scenarios, not handling exceptions can lead to a breakdown of the application.
+
+### Problem Example:
+
+```java
+public class UnhandledExceptionExample {
+    public static void main(String[] args) {
+        divide(10, 0); // This will throw ArithmeticException: / by zero
+        System.out.println("Program continues...");
+    }
+
+    public static int divide(int a, int b) {
+        // Problem: Unhandled exception
+        return a / b;
+    }
+}
+```
+
+In this case, an `ArithmeticException` is thrown because of division by zero, but it is not caught or handled. This will result in a program crash.
+
+### Solution:
+
+Handle exceptions appropriately at the right level of the call stack.
+
+```java
+public class UnhandledExceptionFixed {
+    public static void main(String[] args) {
+        try {
+            divide(10, 0); // This will throw ArithmeticException
+        } catch (ArithmeticException e) {
+            // Solution: Handle the exception at the right level
+            System.err.println("Error: Cannot divide by zero!");
+        }
+        System.out.println("Program continues...");
+    }
+
+    public static int divide(int a, int b) throws ArithmeticException {
+        // Solution: Declare the exception to be thrown
+        return a / b;
+    }
+}
+```
+
+In this solution, the `ArithmeticException` is caught in the calling method (`main`). The method `divide` declares that it can throw an `ArithmeticException`, and the caller handles it, allowing the program to recover from the error without crashing.
+
+<br>
+<hr>
+
+
 

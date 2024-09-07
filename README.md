@@ -1183,5 +1183,140 @@ In this solution, `getCanonicalFile()` resolves the path and ensures the file re
 <br>
 <hr>
 
+# [Data Integrity Errors](#data-integrity-errors)
+
+Data integrity errors occur when data operations produce incorrect or unexpected results due to issues like division by zero, overflows, or type conversion problems. These errors can lead to incorrect behavior, crashes, or security vulnerabilities in your applications.
+
+## [DIVIDE_BY_ZERO](#divide_by_zero)
+
+**Divide by Zero** occurs when an attempt is made to divide a number by zero, which is mathematically undefined and can result in exceptions or application crashes.
+
+### Problem Example:
+
+```java
+public class DivideByZeroExample {
+    public static void main(String[] args) {
+        int a = 10;
+        int b = 0;
+
+        // Problem: Divide by zero
+        int result = a / b; // Will throw ArithmeticException
+        System.out.println("Result: " + result);
+    }
+}
+```
+
+In the above example, the division by zero (`a / b`) will result in an `ArithmeticException`.
+
+### Solution:
+
+Check for zero before performing division.
+
+```java
+public class DivideByZeroFixed {
+    public static void main(String[] args) {
+        int a = 10;
+        int b = 0;
+
+        // Solution: Check if the divisor is zero
+        if (b != 0) {
+            int result = a / b;
+            System.out.println("Result: " + result);
+        } else {
+            System.out.println("Division by zero is not allowed.");
+        }
+    }
+}
+```
+
+In this solution, a check is performed to ensure that `b` is not zero before attempting the division, preventing the exception.
+
+## [INTEGER_OVERFLOW](#integer_overflow)
+
+**Integer Overflow** happens when an arithmetic operation exceeds the range of the integer data type, causing the result to wrap around to an incorrect value.
+
+### Problem Example:
+
+```java
+public class IntegerOverflowExample {
+    public static void main(String[] args) {
+        int max = Integer.MAX_VALUE;
+
+        // Problem: Integer Overflow
+        int result = max + 1;
+        System.out.println("Overflowed Result: " + result); // Will wrap around to a negative number
+    }
+}
+```
+
+In this example, adding `1` to the maximum value of an integer (`Integer.MAX_VALUE`) will cause the result to overflow and wrap around to a negative value.
+
+### Solution:
+
+Use a larger data type (e.g., `long`) or manually check for overflow conditions.
+
+```java
+public class IntegerOverflowFixed {
+    public static void main(String[] args) {
+        int max = Integer.MAX_VALUE;
+
+        // Solution: Check for overflow
+        if (max + 1 < max) {
+            System.out.println("Overflow detected!");
+        } else {
+            int result = max + 1;
+            System.out.println("Result: " + result);
+        }
+    }
+}
+```
+
+This solution detects potential overflow conditions by checking if the result of the addition is smaller than the original value.
+
+
+## [UNINTENDED_CONVERSION](#unintended_conversion)
+
+**Unintended Conversion** occurs when implicit type conversions lead to data loss or unexpected behavior, especially when converting between different types (e.g., from `long` to `int`).
+
+#### Problem Example:
+
+```java
+public class UnintendedConversionExample {
+    public static void main(String[] args) {
+        long largeNumber = 123456789012345L;
+
+        // Problem: Implicit conversion causes data loss
+        int smallerNumber = (int) largeNumber;
+        System.out.println("Converted value: " + smallerNumber); // Loss of precision
+    }
+}
+```
+
+In this example, a large `long` value is cast to an `int`, resulting in a loss of precision and incorrect data.
+
+### Solution:
+
+Avoid implicit conversions and use appropriate data types for the value range.
+
+```java
+public class UnintendedConversionFixed {
+    public static void main(String[] args) {
+        long largeNumber = 123456789012345L;
+
+        // Solution: Use the appropriate data type for the operation
+        if (largeNumber <= Integer.MAX_VALUE && largeNumber >= Integer.MIN_VALUE) {
+            int smallerNumber = (int) largeNumber;
+            System.out.println("Converted value: " + smallerNumber);
+        } else {
+            System.out.println("Conversion would result in data loss.");
+        }
+    }
+}
+```
+
+In this solution, a check is performed to ensure that the value fits within the range of the target data type (`int`) before converting, thus preventing unintended conversion and data loss.
+
+<br>
+<hr>
 
 

@@ -57,7 +57,6 @@ This repository contains examples and explanations of various types of errors de
 	   - [EXCESSIVE_ALLOCATION](#excessive_allocation)
 
 14. [Miscellaneous](#miscellaneous)
-	   - [UNREACHABLE_CODE](#unreachable_code)
 	   - [UNUSED_CODE](#unused_code)
 	   - [MISSING_RETURN](#missing_return)
 
@@ -1634,6 +1633,119 @@ public class OptimizedAllocationExample {
 ```
 
 In the optimized version, string literals are reused instead of creating new `String` objects, reducing memory allocations and improving the overall performance of the application.
+
+<br>
+<hr>
+
+# [Miscellaneous](#miscellaneous)
+
+
+Miscellaneous issues in software development cover a range of minor but significant code problems, such as unused code and missing return statements. These issues may not cause immediate application failure but can lead to unexpected behavior, maintenance challenges, or decreased code quality. Fixing them improves code readability, maintainability, and reliability.
+
+## [UNUSED_CODE](#unused_code)
+
+**Unused Code** refers to variables, methods, or entire classes that are defined but never used in the application. This type of issue often arises during refactoring or when functionality is removed, but remnants of the original code are not fully deleted. Unused code increases the size of the codebase, makes the code harder to understand, and can mislead other developers about its purpose.
+
+### Problem Example:
+
+```java
+public class UnusedCodeExample {
+    // Unused variable
+    private int unusedVariable;
+
+    // Unused method
+    public void unusedMethod() {
+        System.out.println("This method is never called.");
+    }
+
+    public void printMessage() {
+        System.out.println("Hello, World!");
+    }
+
+    public static void main(String[] args) {
+        UnusedCodeExample example = new UnusedCodeExample();
+        example.printMessage();  // The unusedMethod is never called
+    }
+}
+```
+
+In this example, both the `unusedVariable` and `unusedMethod()` are never utilized, yet they remain in the code, adding unnecessary complexity.
+
+### Solution:
+
+Remove any unused code to simplify the codebase and avoid misleading other developers.
+
+```java
+public class CleanedCodeExample {
+    // Removed unused variable and method
+
+    public void printMessage() {
+        System.out.println("Hello, World!");
+    }
+
+    public static void main(String[] args) {
+        CleanedCodeExample example = new CleanedCodeExample();
+        example.printMessage();
+    }
+}
+```
+
+By removing unused code, the class is more concise and easier to understand, and it avoids unnecessary clutter.
+
+
+## [MISSING_RETURN](#missing_return)
+
+
+**Missing Return** occurs when a method or function that is expected to return a value does not have a `return` statement in all execution paths. This can cause unpredictable behavior or compilation errors depending on the context. Missing return statements can be particularly problematic in methods with conditional logic, where not all conditions lead to a return value.
+
+#### Problem Example:
+
+```java
+public class MissingReturnExample {
+
+    // Method that should return a value but may not in certain conditions
+    public int getNumber(boolean condition) {
+        if (condition) {
+            return 42;
+        }
+        // Missing return statement when condition is false
+    }
+
+    public static void main(String[] args) {
+        MissingReturnExample example = new MissingReturnExample();
+        int number = example.getNumber(true);  // Works fine
+        // int missingNumber = example.getNumber(false); // Would cause an issue
+    }
+}
+```
+
+In this example, if the `condition` is `false`, the method `getNumber()` does not return a value, which can cause a compilation error or runtime issue, depending on how it is handled.
+
+#### Solution:
+
+Ensure that all possible execution paths return a value. In cases where no meaningful value exists, a default or error value should be returned.
+
+```java
+public class FixedReturnExample {
+
+    // Method fixed to always return a value
+    public int getNumber(boolean condition) {
+        if (condition) {
+            return 42;
+        } else {
+            return -1;  // Default return value for false condition
+        }
+    }
+
+    public static void main(String[] args) {
+        FixedReturnExample example = new FixedReturnExample();
+        int number = example.getNumber(true);  // 42
+        int defaultNumber = example.getNumber(false);  // -1
+    }
+}
+```
+
+In the fixed version, the method always returns an integer, regardless of the condition, ensuring that the method behaves as expected in all cases.
 
 <br>
 <hr>

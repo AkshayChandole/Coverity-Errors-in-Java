@@ -1513,5 +1513,130 @@ In this solution, the `AND` (`&&`) operator ensures that both conditions—being
 <br>
 <hr>
 
+# [Performance Issues](#performance-issues)
+
+
+Performance issues in software can significantly impact the efficiency and scalability of an application. Two common causes of performance degradation are **inefficient algorithms** and **excessive memory allocations**. These issues may not immediately cause the application to fail, but they lead to slower execution times and higher resource consumption, which is critical for large-scale or high-performance systems.
+
+## [INEFFICIENT_ALGORITHM](#inefficient_algorithm)
+
+**Inefficient Algorithm** errors occur when a poorly optimized algorithm is used to solve a problem, leading to higher time complexity or unnecessary computation. This often happens when algorithms have a higher than necessary Big-O complexity, such as `O(n^2)` or worse, when an `O(n)` solution could be used instead.
+
+### Problem Example:
+
+```java
+import java.util.Arrays;
+
+public class InefficientAlgorithmExample {
+    // Inefficient algorithm: O(n^2) due to nested loops for finding the largest number.
+    public static int findLargest(int[] numbers) {
+        int largest = Integer.MIN_VALUE;
+        for (int i = 0; i < numbers.length; i++) {
+            for (int j = 0; j < numbers.length; j++) {
+                if (numbers[j] > largest) {
+                    largest = numbers[j];
+                }
+            }
+        }
+        return largest;
+    }
+
+    public static void main(String[] args) {
+        int[] numbers = {3, 5, 7, 2, 8};
+        System.out.println("Largest number: " + findLargest(numbers));
+    }
+}
+```
+
+In this example, the algorithm to find the largest number uses nested loops, leading to a time complexity of `O(n^2)`. For large arrays, this will lead to poor performance.
+
+### Solution:
+
+Use an optimized algorithm that scans the array only once (`O(n)` complexity), eliminating unnecessary comparisons.
+
+```java
+public class EfficientAlgorithmExample {
+    // Optimized algorithm: O(n) for finding the largest number.
+    public static int findLargest(int[] numbers) {
+        int largest = Integer.MIN_VALUE;
+        for (int number : numbers) {
+            if (number > largest) {
+                largest = number;
+            }
+        }
+        return largest;
+    }
+
+    public static void main(String[] args) {
+        int[] numbers = {3, 5, 7, 2, 8};
+        System.out.println("Largest number: " + findLargest(numbers));
+    }
+}
+```
+
+In the optimized solution, the array is traversed only once, reducing time complexity to `O(n)` and improving performance significantly, especially for large datasets.
+
+
+## [EXCESSIVE_ALLOCATION](#excessive_allocation)
+
+**Excessive Allocation** occurs when a program allocates more memory than necessary or repeatedly allocates and deallocates objects, leading to memory bloat and high garbage collection overhead. This can reduce performance by putting pressure on the memory manager and making the application slower.
+
+### Problem Example:
+
+```java
+import java.util.ArrayList;
+import java.util.List;
+
+public class ExcessiveAllocationExample {
+    // Problem: Excessive memory allocation by creating new objects in a loop.
+    public static List<String> generateStringList(int n) {
+        List<String> stringList = new ArrayList<>();
+        for (int i = 0; i < n; i++) {
+            String s = new String("Item " + i);  // Excessive allocation
+            stringList.add(s);
+        }
+        return stringList;
+    }
+
+    public static void main(String[] args) {
+        List<String> list = generateStringList(1000);
+        System.out.println("List size: " + list.size());
+    }
+}
+```
+
+In this example, creating new `String` objects inside a loop leads to excessive memory allocation. The `new String()` operation creates unnecessary objects instead of reusing literals, which consumes additional memory and can lead to performance bottlenecks.
+
+### Solution:
+
+Avoid unnecessary object creation by reusing existing literals or applying optimizations such as object pooling.
+
+```java
+import java.util.ArrayList;
+import java.util.List;
+
+public class OptimizedAllocationExample {
+    // Optimized: Reusing string literals instead of creating new objects.
+    public static List<String> generateStringList(int n) {
+        List<String> stringList = new ArrayList<>();
+        for (int i = 0; i < n; i++) {
+            String s = "Item " + i;  // Reusing string literals
+            stringList.add(s);
+        }
+        return stringList;
+    }
+
+    public static void main(String[] args) {
+        List<String> list = generateStringList(1000);
+        System.out.println("List size: " + list.size());
+    }
+}
+```
+
+In the optimized version, string literals are reused instead of creating new `String` objects, reducing memory allocations and improving the overall performance of the application.
+
+<br>
+<hr>
+
 
 

@@ -1421,5 +1421,97 @@ In this solution, the `ArithmeticException` is caught in the calling method (`ma
 <br>
 <hr>
 
+# [Logical Errors](#logical-errors)
+
+Logical errors occur when the program's logic is flawed, leading to incorrect or unintended behavior even though the code runs without any runtime errors. These errors can be hard to detect because they don't cause immediate failures but result in incorrect output or unintended operations.
+
+## [CONSTANT_EXPRESSION_RESULT](#constant_expression_result)
+
+**Constant Expression Result** refers to a situation where a logical operation always yields the same result due to constant values in the expression. These issues often arise when developers mistakenly write conditional logic with hardcoded values, making the check meaningless.
+
+### Problem Example:
+```java
+public class ConstantExpressionResultExample {
+    public static void main(String[] args) {
+        int a = 5;
+
+        // Problem: This condition is always true because 'a' is always equal to 5.
+        if (a == 5) {
+            System.out.println("This will always print.");
+        }
+    }
+}
+```
+
+In this case, the expression `a == 5` will always evaluate to true, making the condition unnecessary. This is a logical error because the condition is redundant and does not add value to the program logic.
+
+#### Solution:
+
+Ensure that variable conditions are used appropriately, and avoid hardcoding values that lead to constant results.
+
+```java
+public class ConstantExpressionResultFixed {
+    public static void main(String[] args) {
+        int a = 5;
+        int b = 10;
+
+        // Solution: Compare two variables, making the condition meaningful
+        if (a < b) {
+            System.out.println("This condition depends on dynamic values.");
+        }
+    }
+}
+```
+
+In the corrected version, the condition now compares two variables (`a < b`), which provides a meaningful check based on dynamic values.
+
+
+## [LOGICAL_OP](#logical_op)
+
+**Logical Operation (LOGICAL_OP)** errors occur when a logical operation (such as `AND`, `OR`, or `NOT`) is used incorrectly, leading to unintended behavior. These mistakes often arise from misunderstandings of operator precedence or incorrect assumptions about the logic.
+
+### Problem Example:
+
+```java
+public class LogicalOpExample {
+    public static void main(String[] args) {
+        int age = 20;
+        boolean hasLicense = true;
+
+        // Problem: Incorrect logical operation using 'OR' instead of 'AND'
+        if (age >= 18 || hasLicense) {
+            System.out.println("You can drive.");
+        }
+    }
+}
+```
+
+In this example, the condition `age >= 18 || hasLicense` allows the message to print if **either** condition is true, which is incorrect logic for determining if someone can drive (both conditions should be true).
+
+### Solution:
+
+Use the correct logical operator (`AND` in this case) to ensure that both conditions are met.
+
+```java
+public class LogicalOpFixed {
+    public static void main(String[] args) {
+        int age = 20;
+        boolean hasLicense = true;
+
+        // Solution: Correct logical operation using 'AND'
+        if (age >= 18 && hasLicense) {
+            System.out.println("You can drive.");
+        } else {
+            System.out.println("You cannot drive.");
+        }
+    }
+}
+```
+
+In this solution, the `AND` (`&&`) operator ensures that both conditions—being at least 18 years old **and** having a license—are required for the person to be allowed to drive.
+
+<br>
+<hr>
+
 
 

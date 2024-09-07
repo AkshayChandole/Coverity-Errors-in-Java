@@ -1,6 +1,9 @@
 # Coverity-Errors-in-Java
 This repository contains examples and explanations of various types of errors detected by Coverity static analysis tools in Java code.
 
+![slidesgo-addressing-coverity-issues-in-java-best-practices-for-code-quality-and-security-20240907185103vQi2](https://github.com/user-attachments/assets/da19a2b1-5aac-4c78-8127-e470482d85b0)
+
+
 ## Table of Contents
 
 1. [Introduction](#introduction)

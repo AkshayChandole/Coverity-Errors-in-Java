@@ -991,6 +991,197 @@ In this fixed version, the `BufferedReader` is properly closed using the `try-wi
 <br>
 <hr>
 
+# [Security Vulnerabilities](#security-vulnerabilities)
+
+Security vulnerabilities are weaknesses in code that attackers can exploit to gain unauthorized access, manipulate data, or compromise system integrity. It is crucial to mitigate these vulnerabilities to protect applications from malicious attacks.
+
+## [SQL_INJECTION](#sql_injection)
+
+**SQL Injection** occurs when user input is improperly handled in SQL queries, allowing attackers to execute arbitrary SQL code. This can lead to unauthorized data access, data manipulation, or even database destruction.
+
+### Problem Example:
+
+```java
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
+
+public class SQLInjectionExample {
+    public void getUserData(String username) throws Exception {
+        Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/mydb", "user", "password");
+        Statement stmt = conn.createStatement();
+        
+        // Vulnerable to SQL Injection
+        String query = "SELECT * FROM users WHERE username = '" + username + "'";
+        ResultSet rs = stmt.executeQuery(query);
+        
+        while (rs.next()) {
+            System.out.println("User: " + rs.getString("username"));
+        }
+        
+        rs.close();
+        stmt.close();
+        conn.close();
+    }
+
+    public static void main(String[] args) throws Exception {
+        SQLInjectionExample example = new SQLInjectionExample();
+        example.getUserData("' OR '1'='1"); // Malicious input causing SQL injection
+    }
+}
+```
+
+In this example, a malicious user can input `"' OR '1'='1"`, which would execute a query returning all users.
+
+### Solution:
+
+Use prepared statements with parameterized queries to prevent SQL injection.
+
+```java
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+
+public class SQLInjectionFixed {
+    public void getUserData(String username) throws Exception {
+        Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/mydb", "user", "password");
+        
+        // Use PreparedStatement to prevent SQL Injection
+        String query = "SELECT * FROM users WHERE username = ?";
+        PreparedStatement pstmt = conn.prepareStatement(query);
+        pstmt.setString(1, username);
+        ResultSet rs = pstmt.executeQuery();
+        
+        while (rs.next()) {
+            System.out.println("User: " + rs.getString("username"));
+        }
+        
+        rs.close();
+        pstmt.close();
+        conn.close();
+    }
+
+    public static void main(String[] args) throws Exception {
+        SQLInjectionFixed example = new SQLInjectionFixed();
+        example.getUserData("admin"); // Safe query execution
+    }
+}
+```
+
+Here, `PreparedStatement` ensures that user input is treated as data rather than part of the SQL query, preventing injection attacks.
+
+## [XSS_VULNERABILITY](#xss_vulnerability)
+
+**Cross-Site Scripting (XSS)** allows attackers to inject malicious scripts into web pages viewed by other users. This can result in stolen session cookies, unauthorized actions on behalf of users, or compromised user data.
+
+### Problem Example:
+
+```java
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+
+public class XSSVulnerabilityExample {
+    public void showProfile(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String username = request.getParameter("username");
+        
+        // Vulnerable to XSS attack
+        response.getWriter().println("<html><body>Welcome, " + username + "</body></html>");
+    }
+}
+```
+
+In this example, if the user enters a script as their username (`<script>alert('Hacked!')</script>`), it will be executed in the browser when the page is displayed.
+
+### Solution:
+
+Sanitize user input or encode output to prevent script execution.
+
+```java
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import org.apache.commons.text.StringEscapeUtils;
+
+public class XSSVulnerabilityFixed {
+    public void showProfile(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String username = request.getParameter("username");
+        
+        // Encode user input to prevent XSS
+        String safeUsername = StringEscapeUtils.escapeHtml4(username);
+        response.getWriter().println("<html><body>Welcome, " + safeUsername + "</body></html>");
+    }
+}
+```
+
+By using the `StringEscapeUtils.escapeHtml4()` method from Apache Commons Text, we ensure that any HTML or script input is properly escaped, rendering it harmless.
+
+## [PATH_TRAVERSAL](#path_traversal)
+
+**Path Traversal** vulnerabilities occur when user input is used to construct file paths, allowing attackers to access restricted files by manipulating the path (e.g., `../../etc/passwd`).
+
+### Problem Example:
+
+```java
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+
+public class PathTraversalExample {
+    public void readFile(String fileName) throws IOException {
+        // Vulnerable to Path Traversal
+        File file = new File("/var/www/html/" + fileName);
+        FileReader reader = new FileReader(file);
+        // Reading the file...
+        reader.close();
+    }
+
+    public static void main(String[] args) throws IOException {
+        PathTraversalExample example = new PathTraversalExample();
+        example.readFile("../../etc/passwd"); // Malicious file access
+    }
+}
+```
+
+In this example, an attacker can manipulate the `fileName` parameter to access files outside the intended directory, like system files.
+
+### Solution:
+
+Validate and sanitize user input to restrict file path manipulation.
+```java
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+
+public class PathTraversalFixed {
+    public void readFile(String fileName) throws IOException {
+        // Restrict file access to the allowed directory
+        File baseDir = new File("/var/www/html/");
+        File file = new File(baseDir, fileName).getCanonicalFile();
+
+        // Ensure the file is within the base directory
+        if (!file.getPath().startsWith(baseDir.getPath())) {
+            throw new IOException("Invalid file path!");
+        }
+
+        FileReader reader = new FileReader(file);
+        // Reading the file...
+        reader.close();
+    }
+
+    public static void main(String[] args) throws IOException {
+        PathTraversalFixed example = new PathTraversalFixed();
+        example.readFile("example.txt"); // Safe file access
+    }
+}
+```
+
+In this solution, `getCanonicalFile()` resolves the path and ensures the file remains within the allowed directory. This prevents attackers from accessing unintended files.
+
+<br>
+<hr>
 
 
 
